@@ -1,0 +1,67 @@
+#Default_Volatile
+#Enable_Stack_Checking
+#Enable_Trace
+
+Digital_Input Forward, Backward;
+
+String_Output projectorRequestTX$;
+String_Output commandName$;
+
+//Structures
+Structure projCommand
+{
+	STRING name$[20];
+    STRING commandByte$[10];
+};
+
+//Global Variables
+                    
+STRING header[40];
+projCommand zoomCommands[7];
+STRING endByte[40];
+Integer Selected;
+
+//Functions
+Push Forward
+{
+	IF(Selected <7)
+	{
+		Selected = Selected + 1;
+		commandName$ = zoomCommands[Selected].name$;
+		Makestring(projectorRequestTX$, "%s%s%S", header, zoomCommands[Selected].commandByte$, endByte);
+	}
+}
+
+Push Backward
+{
+	If(Selected >=1)
+	{
+		Selected = Selected - 1;
+		commandName$ = zoomCommands[Selected].name$;
+		Makestring(projectorRequestTX$, "%s%s%S", header, zoomCommands[Selected].commandByte$, endByte);
+	}
+}
+
+//Function Main
+
+Function Main()
+{
+ //Initalize Variables
+	zoomCommands[1].name$ = "Auto";
+	zoomCommands[1].commandByte$ = "0";
+	zoomCommands[2].name$ = "Normal (4:3)";
+	zoomCommands[2].commandByte$ = "1";
+	zoomCommands[3].name$ = "Wide (16:9)";
+	zoomCommands[3].commandByte$ = "2";
+	zoomCommands[4].name$ = "Native";
+	zoomCommands[4].commandByte$ = "5";
+	zoomCommands[5].name$ = "Full (HV Fit)";
+	zoomCommands[5].commandByte$ = "6";
+	zoomCommands[6].name$ = "H-Fit";
+	zoomCommands[6].commandByte$ = "9";
+	zoomCommands[7].name$ = "V-Fit";
+	zoomCommands[7].commandByte$ = "10";
+	Selected = 1;
+	header = "\x30\x30VSE:";
+	endByte = "\x0d";
+}
